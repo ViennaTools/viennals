@@ -514,7 +514,11 @@ public:
 #endif
 
     materialMeshes.push_back(clipper->GetOutput());
-    materialIds.push_back(0);
+    const bool useMaterialMap = materialMap != nullptr;
+    if (useMaterialMap)
+      materialIds.push_back(materialMap->getMaterialId(0));
+    else
+      materialIds.push_back(0);
 
 #ifdef LS_TO_VISUALIZATION_DEBUG
     {
@@ -526,7 +530,6 @@ public:
 #endif
 
     unsigned counter = 1;
-    const bool useMaterialMap = materialMap != nullptr;
 
     // now cut large volume mesh with all the smaller ones
     for (typename LevelSetsType::const_reverse_iterator it =

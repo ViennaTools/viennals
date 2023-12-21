@@ -48,6 +48,7 @@
 #include <lsToMesh.hpp>
 #include <lsToSurfaceMesh.hpp>
 #include <lsToVoxelMesh.hpp>
+#include <lsTransformMesh.hpp>
 #include <lsVTKReader.hpp>
 #include <lsVTKWriter.hpp>
 #include <lsWriteVisualizationMesh.hpp>
@@ -808,6 +809,28 @@ PYBIND11_MODULE(VIENNALS_MODULE_NAME, module) {
            "in the mesh elements.")
       .def("print", &lsMesh<T>::print,
            "Print basic information about the mesh.");
+
+  // lsTransformEnum
+  pybind11::enum_<lsTransformEnum>(module, "lsTransformEnum")
+      .value("TRANSLATION", lsTransformEnum::TRANSLATION)
+      .value("SCALE", lsTransformEnum::SCALE)
+      .value("ROTATION", lsTransformEnum::ROTATION);
+
+  // lsTransformMesh
+  pybind11::class_<lsTransformMesh<T>, lsSmartPointer<lsTransformMesh<T>>>(
+      module, "lsTransformMesh")
+      // constructors
+      .def(pybind11::init(
+               [](lsSmartPointer<lsMesh<T>> &domain, lsTransformEnum op,
+                  std::array<double, 3> transformVector, double angle) {
+                 return lsSmartPointer<lsTransformMesh<T>>::New(
+                     domain, op, transformVector, angle);
+               }),
+           pybind11::arg("mesh"), pybind11::arg("operation"),
+           pybind11::arg("transformVector") = {}, pybind11::arg("angle") = 0.0)
+      // methods
+      .def("apply", &lsTransformMesh<T>::apply,
+           "Apply the transform to the mesh.");
 
   // lsPrune
   pybind11::class_<lsPrune<T, D>, lsSmartPointer<lsPrune<T, D>>>(module,
